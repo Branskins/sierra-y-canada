@@ -26,6 +26,10 @@ def save_pokemon_resources(resources):
     resources.to_csv('data/pokemon_resources.csv', index=False)
 
 
+def read_pokemon_resources():
+    return pd.read_csv('data/pokemon_resources.csv')
+
+
 def main():
     resources = get_pokemon_resources()
     save_pokemon_resources(resources)

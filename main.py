@@ -21,20 +21,20 @@ DEVICE = (
 
 def main():
     train_transform = v2.Compose([
-    v2.Resize(size=(256,256)),
-    v2.ToDtype(torch.float32),
-    v2.Normalize(
-        mean=[85.6542, 80.4268, 72.8841],
-        std=[93.3963, 88.0354, 82.0991]
-    )
+        v2.Resize(size=(256,256)),
+        v2.ToDtype(torch.float32, scale=True),
+        # v2.Normalize(
+        #     mean=[85.6542, 80.4268, 72.8841],
+        #     std=[93.3963, 88.0354, 82.0991]
+        # )
     ])
     test_transform = v2.Compose([
         v2.Resize(size=(256,256)),
-        v2.ToDtype(torch.float32),
-        v2.Normalize(
-            mean=[231.0843, 225.8617, 219.1473],
-            std=[43.8241, 48.9563, 60.1995]
-        )
+        v2.ToDtype(torch.float32, scale=True),
+        # v2.Normalize(
+        #     mean=[231.0843, 225.8617, 219.1473],
+        #     std=[43.8241, 48.9563, 60.1995]
+        # )
     ])
 
     train_data = PokemonDataset('data/train_labels.csv', 'data/train', train_transform)
@@ -86,14 +86,19 @@ class NeuralNetwork(nn.Module):
         self.sequential_stack = nn.Sequential(
             nn.Linear(input_size, 6144),
             nn.ReLU(),
+            nn.Dropout(0.2),
             nn.Linear(6144, 3072),
             nn.ReLU(),
+            nn.Dropout(),
             nn.Linear(3072, 1536),
             nn.ReLU(),
+            nn.Dropout(),
             nn.Linear(1536, 768),
             nn.ReLU(),
+            nn.Dropout(),
             nn.Linear(768, 384),
             nn.ReLU(),
+            nn.Dropout(),
             nn.Linear(384, 151)
         )
 
@@ -122,7 +127,7 @@ def train(dataloader, model, loss_fn, optimizer):
 
         if batch % 15 == 0:
             loss, current = loss.item(), (batch + 1) * len(X)
-            print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
+            print(f"loss: {loss:>7f} [{current:>5d}/{size:>5d}]")
 
 def test(dataloader, model, loss_fn):
     model.eval()
@@ -139,7 +144,7 @@ def test(dataloader, model, loss_fn):
     
     test_loss /= num_batches
     correct /= size
-    print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>7f} \n")
+    print(f"Test Error:\n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>7f} \n")
 
 if __name__ == '__main__':
     main()

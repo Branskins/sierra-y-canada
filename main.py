@@ -47,9 +47,9 @@ def main():
     model = NeuralNetwork(196608).to(DEVICE)
 
     loss_fn = nn.CrossEntropyLoss()
-    optimizer = SGD(model.parameters(), lr=1e-3)
+    optimizer = SGD(model.parameters(), lr=1e-3, momentum=0.9, weight_decay=1e-4)
 
-    epochs = 5
+    epochs = 100
     for t in range(epochs):
         print(f"Epoch {t+1}\n-------------------------------")
         train(train_dataloader, model, loss_fn, optimizer)
@@ -89,16 +89,16 @@ class NeuralNetwork(nn.Module):
             nn.Dropout(0.2),
             nn.Linear(6144, 3072),
             nn.ReLU(),
-            nn.Dropout(),
+            nn.Dropout(0.3),
             nn.Linear(3072, 1536),
             nn.ReLU(),
-            nn.Dropout(),
+            nn.Dropout(0.3),
             nn.Linear(1536, 768),
             nn.ReLU(),
-            nn.Dropout(),
+            nn.Dropout(0.3),
             nn.Linear(768, 384),
             nn.ReLU(),
-            nn.Dropout(),
+            nn.Dropout(0.3),
             nn.Linear(384, 151)
         )
 
